@@ -1,17 +1,18 @@
 use futures::Stream;
 
-pub trait Exti<'p> {
+pub trait Exti: Stream<Error = ()> {
     type EdgeType;
-    type Stream: Stream<Item = Self::EdgeType, Error = ()>;
+    type Item = Self::EdgeType;
 
     fn trigger_on_rising(&self);
     fn trigger_on_falling(&self);
     fn trigger_on_both(&self);
-    fn stream(&'p self) -> Self::Stream;
+    fn trigger_off(&self);
 }
 
 pub trait ExtiPin<'p> {
-    type Exti: Exti<'p>;
+    type Exti: Exti;
+
     fn exti(&'p self) -> Option<Self::Exti>;
 }
 
@@ -27,10 +28,10 @@ pub trait BasicPin {
 pub trait AdvancedPin {
     type OutputSpeed;
 
-    fn make_pull_up(&self);
-    fn make_pull_down(&self);
-    fn make_pull_none(&self);
+    fn make_pulled_up(&self);
+    fn make_pulled_down(&self);
+    fn make_pulled_none(&self);
     fn set_output_speed(&self, speed: Self::OutputSpeed);
-    fn make_open_drain_output(&self);
-    fn make_push_pull_output(&self);
+    fn make_output_open_drain(&self);
+    fn make_output_push_pull(&self);
 }
